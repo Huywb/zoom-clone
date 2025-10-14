@@ -120,3 +120,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+.bg-dark-1{
+  background-color: #1C1F2E;
+}
+.bg-dark-2{
+  background-color: #161925;
+}
+
+@layer utilities{
+  .flex-center {
+    @apply flex justify-center items-center
+  }
+
+  .flex-between {
+    @apply flex justify-between items-center
+  }
+}
