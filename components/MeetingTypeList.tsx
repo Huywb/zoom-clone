@@ -1,0 +1,83 @@
+'use client'
+import Image from 'next/image'
+import React, { useState } from 'react'
+import HomeCard from './HomeCard'
+import { useRouter } from 'next/navigation'
+import MeetingModel from './MeetingModel'
+import { useUser } from '@clerk/clerk-react'
+import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk'
+import { toast } from 'sonner'
+const MeetingTypeList = () => {
+    const router = useRouter()
+    const [meetingState,setMeetngState] = useState<'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantmeeting' | undefined>()
+    
+    const [values,setValues] = useState(
+        {
+            date: new Date(),
+            description: '',
+            link: ''
+        }
+    )
+
+    const [callDetails,setCallDetails] = useState<Call>()
+    const {user} = useUser()
+    const client = useStreamVideoClient()
+
+    const createMeeting =async ()=>{
+        if(!client || !user) return
+        
+        try {
+            if(!values.date){
+                toast.error("Please select a date and time")
+                return
+            }
+            const id = crypto.randomUUID()
+            const call = client.call("default",id)
+
+            if(!call) throw Error("Failed to create call")
+
+            const startsAt = values.date.toISOString() || new Date(Date.now()).toISOString()
+
+            const description = values.description || "Instant meeting"
+
+            await call.getOrCreate({
+                data: {
+                    starts_at: startsAt,
+                    custom: {
+                        description
+                    }
+                }
+            })
+
+            setCallDetails(call)
+
+            if(!values.description){
+                router.push(`/meeting/${call.id}`)
+            }
+            toast.success("Meeting created")
+        } catch (error) {
+            toast.error("Event has been created.")
+            console.log(error)
+        }
+    }
+  
+    return (
+    <section className='grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4'>
+        <HomeCard className='bg-orange-500' handleClick={()=>setMeetngState('isInstantmeeting')} img='/icons/add-meeting.svg' title='New Meeting' description='Start an instant meeting' />
+        <HomeCard className='bg-blue-600' handleClick={()=>setMeetngState('isScheduleMeeting')} img='/icons/schedule.svg' title='Schedule Meeting' description='Plan your meeting' />
+        <HomeCard className='bg-purple-700' handleClick={()=>router.push('/recordings')} img='/icons/recordings.svg' title='View Recordings' description='Check out your recordings' />
+        <HomeCard className='bg-yellow-500' handleClick={()=>setMeetngState('isJoiningMeeting')} img='/icons/join-meeting.svg' title='Join Meeting' description='Via invitation link' />
+
+    <MeetingModel 
+        isOpen={meetingState === 'isInstantmeeting'} 
+        onClose={()=>setMeetngState(undefined)}
+        title="Start an Instant Meeting"
+        className='text-center'
+        buttonText='Start Meeting'
+        handleClick={createMeeting}
+    />
+    </section>
+  )
+}
+
+export default MeetingTypeList
