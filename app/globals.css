@@ -128,11 +128,8 @@
   background-color: #161925;
 }
 
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.bg-hero{
+  background-image: url('/images/hero-background.png')
 }
 
 /* ======== stream css overrides ======== */
