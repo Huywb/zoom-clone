@@ -35,6 +35,7 @@ const MeetingModel:React.FC<MeetingModelProps> = ({isOpen,onClose,title,classNam
                     )
                 }
                 <h1 className='text-3xl font-bold leading-[42px]'>{title}</h1>
+                {children}
                 <Button onClick={handleClick} className='transition duration-300 hover:bg-blue-400 cursor-pointer bg-blue-500 focus-visible:ring-0 focus-visible:ring-offset-0'>
                     {buttonIcon && (
                         <Image src={buttonIcon} alt='button icon' width={13} height={13}></Image>

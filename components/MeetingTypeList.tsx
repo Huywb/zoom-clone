@@ -62,6 +62,8 @@ const MeetingTypeList = () => {
             console.log(error)
         }
     }
+
+    const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`
   
     return (
     <section className='grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4'>
@@ -84,7 +86,7 @@ const MeetingTypeList = () => {
                     </label>
                     <Textarea onChange={(e)=> {
                         setValues({...values,description: e.target.value})
-                    }} className='border-none bg-dark-3 focus-within:ring-0 focus-within:ring-offset-0'/>
+                    }} className=' border-none bg-gray-700 focus-within:ring-0 focus-within:outline-none focus-within:ring-offset-0'/>
                 </div>
                 <div className='flex w-full flex-col gap-2.5'>
                     <label className='text-base text-nowrap leading-[22px]'>
@@ -94,9 +96,15 @@ const MeetingTypeList = () => {
                         selected={values.date}
                         onChange={(time)=> setValues({...values,date: time!})}
                         showTimeSelect
+                        timeFormat='HH:mm'
+                        timeIntervals={15}
+                        timeCaption='time'
+                        dateFormat="MMMM d,yyyy h:mm aa"
+                        className='w-full bg-gray-700 p-2 focus:outline-none'
                     />
                 </div>
-            </MeetingModel>
+
+                </MeetingModel>
             ): (
             <MeetingModel 
                 isOpen={meetingState === 'isScheduleMeeting'} 
@@ -104,6 +112,8 @@ const MeetingTypeList = () => {
                 title="Meeting created"
                 className='text-center'
                 handleClick={()=>{
+                    navigator.clipboard.writeText(meetingLink)
+                    toast("Link copied")
                 }}
                 image='/icons/checked.svg'
                 buttonIcon='/icons/copy.svg'
