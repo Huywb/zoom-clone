@@ -9,6 +9,7 @@ import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk'
 import { toast } from 'sonner'
 import { Textarea } from './ui/textarea'
 import ReactDatePicker from 'react-datepicker'
+import { Input } from './ui/input'
 const MeetingTypeList = () => {
     const router = useRouter()
     const [meetingState,setMeetngState] = useState<'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantmeeting' | undefined>()
@@ -39,12 +40,12 @@ const MeetingTypeList = () => {
             if(!call) throw Error("Failed to create call")
 
             const startsAt = values.date.toISOString() || new Date(Date.now()).toISOString()
-
+            console.log('startAt',startsAt)
             const description = values.description || "Instant meeting"
 
             await call.getOrCreate({
                 data: {
-                    starts_at: startsAt,
+                    starts_at: startsAt.toString(),
                     custom: {
                         description
                     }
@@ -62,6 +63,7 @@ const MeetingTypeList = () => {
             console.log(error)
         }
     }
+    console.log(values.date)
 
     const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`
   
@@ -130,6 +132,21 @@ const MeetingTypeList = () => {
         buttonText='Start Meeting'
         handleClick={createMeeting}
     />
+
+    <MeetingModel 
+        isOpen={meetingState === 'isJoiningMeeting'} 
+        onClose={()=>setMeetngState(undefined)}
+        title="Join a Meeting Room with Link"
+        className='text-center'
+        buttonText='Join Meeting'
+        handleClick={()=>router.push(values.link)}
+    >
+        <Input 
+            placeholder='Meeting link'
+            className='border-none bg-gray-700 focus-visible:ring-0 focus-visible:ring-offset-0'
+            onChange={(e)=> setValues({...values,link: e.target.value})}
+        />
+    </MeetingModel>
     </section>
   )
 }
